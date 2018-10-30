@@ -1,9 +1,9 @@
-rb = 100; %radius of base mm
+rb = 167.14; %radius of base mm
 top_angle_offset = 0; %smallest angle between 2 mounts
-rp = 100;
+rp = rb;
 h = 200;
 l_crank = 100;
-n_segments = 1;
+l_rocker = sqrt(h^2 + l_crank^2);
 
 linewidth = 2;
 x_lim = 200;
@@ -12,8 +12,8 @@ y_lim = 200;
 Tx=0;
 Ty=0;
 Tz=0;
-alpha=10/n_segments;
-beta=0;
+alpha=0/n_segments;
+beta=22.5/n_segments;
 gamma=0;
 
 T = ones(7,3);
@@ -22,7 +22,7 @@ base = ones(7,3);
 R = eye(3);
 lengths = ones(n_segments,6);
 %servo_pos = ones(n_segments,6);
-servo_angle = pi/4*ones(n_segments, 6);
+servo_angle = pi*ones(n_segments, 6);
 B = ones(n_segments, 6);
 
 %base platform
@@ -49,11 +49,12 @@ end
 plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
 hold on;
 
+%{
 %solve rocker length such that servo_angle starts at 45
 crank = [base(1,1) + l_crank*cos(B(1))*cos(servo_angle(1)), base(1,2) + l_crank*cos(servo_angle(1))*sin(B(1)),...
         base(1,3) + l_crank*sin(servo_angle(1))];
 l_rocker = norm(crank - top(1,:));
-
+%}
  
 %{
 %plot links
