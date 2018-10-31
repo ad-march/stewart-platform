@@ -1,10 +1,10 @@
-rb = 167.14; %radius of base mm
-top_angle_offset = 0; %smallest angle between 2 mounts
+rb = 78; %radius of base mm
+angle_offset = 20; %smallest angle between 2 mounts
 rp = rb;
 h = 200;
-l_crank = 100;
+l_crank = 50;
 l_rocker = sqrt(h^2 + l_crank^2);
-
+n_segments = 8;
 linewidth = 2;
 x_lim = 200;
 y_lim = 200;
@@ -13,22 +13,27 @@ Tx=0;
 Ty=0;
 Tz=0;
 alpha=0/n_segments;
-beta=22.5/n_segments;
+beta=30/n_segments;
 gamma=0;
 
 T = ones(7,3);
 top = ones(7,3);
 base = ones(7,3);
 R = eye(3);
-lengths = ones(n_segments,6);
-%servo_pos = ones(n_segments,6);
-servo_angle = pi*ones(n_segments, 6);
-B = ones(n_segments, 6);
+lengths = ones(6,n_segments);
+servo_angle = zeros(6,n_segments);
+B = ones(n_segments, 6); %crank angle?
+
 
 %base platform
 for i=0:6
-  angle = i*60;
-  base(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), -h];
+    if mod(i,2)==0 %if i is even
+    angle = i*60 + angle_offset;  
+      
+    else
+    angle = i*60 - angle_offset;  
+    end
+    base(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), -h];
   B(i+1) = deg2rad(angle+90);
 end
 %plot base
@@ -38,10 +43,10 @@ hold on;
 %top platform
 for i=0:6
     if mod(i,2)==0 %if i is even
-    angle = i*60 + top_angle_offset;  
+    angle = i*60 + angle_offset;  
       
     else
-    angle = i*60 - top_angle_offset;  
+    angle = i*60 - angle_offset;  
     end
   top(i+1,:) = [rp*cos(deg2rad(angle)), rp*sin(deg2rad(angle)), 0];
 end
@@ -49,22 +54,6 @@ end
 plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
 hold on;
 
-%{
-%solve rocker length such that servo_angle starts at 45
-crank = [base(1,1) + l_crank*cos(B(1))*cos(servo_angle(1)), base(1,2) + l_crank*cos(servo_angle(1))*sin(B(1)),...
-        base(1,3) + l_crank*sin(servo_angle(1))];
-l_rocker = norm(crank - top(1,:));
-%}
- 
-%{
-%plot links
-for i=0:0
-  links = [top(i+1,:); base(i+1,:)];
-  plot3(links(:,1),links(:,2),links(:,3),'b', 'linewidth', linewidth);
-  %lengths(i+1)= norm(top(i+1,:) - base(i+1,:));
-  hold on;
-end
-%}
 
 %plot crank and rocker
 for i=1:6
@@ -72,9 +61,9 @@ lengths(i) = norm(top(i,:) - base(i,:));
 M = 2*l_crank*(top(i,3)-base(i,3));
 N = 2*l_crank*(cos(B(i))*(top(i,1)-base(i,1)) + sin(B(i))*(top(i,2)-base(i,2)));
 L=lengths(i)^2-(l_rocker^2-l_crank^2);
-servo_angle(i) = asin(L/sqrt(M^2+N^2)) - atan(N/M);
-crank = [base(i,1) + l_crank*cos(B(i))*cos(servo_angle(i)), base(i,2) + l_crank*cos(servo_angle(i))*sin(B(i)),...
-        base(i,3) + l_crank*sin(servo_angle(i))];
+servo_angle(i,1) = asin(L/sqrt(M^2+N^2)) - atan(N/M);
+crank = [base(i,1) + l_crank*cos(B(i))*cos(servo_angle(i,1)), base(i,2) + l_crank*cos(servo_angle(i,1))*sin(B(i)),...
+        base(i,3) + l_crank*sin(servo_angle(i,1))];
 
 link1 = [top(i,:); crank];
 link2 = [crank;base(i,:)];
@@ -85,14 +74,10 @@ hold on;
 end
 
 
-axis([-x_lim x_lim -y_lim y_lim -h h]);
+axis([-x_lim x_lim -y_lim y_lim -h-l_crank h]);
 grid on;
 hold off;
   
-
-
-
-
 
 %{
 prompt = 'enter Rotation X ';
@@ -116,7 +101,7 @@ Tz = input(prompt)/n_segments;
 
 %%{
 %move platform
-for j=0:n_segments
+for j=1:n_segments
 
 pause(1);
 
@@ -158,9 +143,9 @@ lengths(i) = norm(top(i,:) - base(i,:));
 M = 2*l_crank*(top(i,3)-base(i,3));
 N = 2*l_crank*(cos(B(i))*(top(i,1)-base(i,1)) + sin(B(i))*(top(i,2)-base(i,2)));
 L=lengths(i)^2-(l_rocker^2-l_crank^2);
-servo_angle(i) = asin(L/sqrt(M^2+N^2)) - atan(N/M);
-crank = [base(i,1) + l_crank*cos(B(i))*cos(servo_angle(i)), base(i,2) + l_crank*cos(servo_angle(i))*sin(B(i)),...
-        base(i,3) + l_crank*sin(servo_angle(i))];
+servo_angle(i,j+1) = asin(L/sqrt(M^2+N^2)) - atan(N/M);
+crank = [base(i,1) + l_crank*cos(B(i))*cos(servo_angle(i,j+1)), base(i,2) + l_crank*cos(servo_angle(i,j+1))*sin(B(i)),...
+        base(i,3) + l_crank*sin(servo_angle(i,j+1))];
 
 link1 = [top(i,:); crank];
 link2 = [crank;base(i,:)];
@@ -168,6 +153,7 @@ plot3(link1(:,1),link1(:,2),link1(:,3),'m', 'linewidth', linewidth);
 hold on;
 plot3(link2(:,1),link2(:,2),link2(:,3),'c', 'linewidth', linewidth);
 hold on;
+
 end
 
 
@@ -178,8 +164,11 @@ grid on;
 xlabel('x');
 ylabel('y');
 end
-
 %%}
+
+
+
+array = rad2deg(servo_angle);
 
 
 
