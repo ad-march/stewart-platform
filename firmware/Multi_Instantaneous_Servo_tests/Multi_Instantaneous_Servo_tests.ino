@@ -9,9 +9,8 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 int servonum = 0;
 int servo_quantity = 2;
 int speed = 5;
-int step_size = 1;
-double current_angle [] = {150,150};
-double target_angle [] = {300, 500};
+double current_angle [servo_quantity] = {150,150};
+double target_angle [servo_quantity] = {300, 500};
 
 void setup() {
   Serial.begin(9600);
@@ -26,11 +25,11 @@ void setup() {
 
 void loop() {
 
+//Finds servo having to move the most
 int max_diff = 0;
 int servonum_max = 0;
-
-  for (int i = 1; i <= servo_quantity; i++) {
-    //find maxx difference start to taget
+  
+  for (int i = 0; i < servo_quantity; i++) {
     int diff = abs(target_angle[i]-current angle[i]);
     
     if (diff > max_diff){
@@ -38,7 +37,30 @@ int servonum_max = 0;
       servonum_max = i;
     }
   }
-  
+
+// Split into step sizes for same total move time
+double step_size [servo_quantity];
+ for (int j = 0; j < servo_quantity; i++) {
+  step_size[j] = (abs(target_angle[j]-current_angle[j]))/max_diff;
+ }
+
+
+//makes stuff move
+
+for (int k = 0, k < servo quantity, k++){
+
+  double pulselen = current_angle[k] + step_size[k];
+}
+
+
+
+for (double pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen=pulselen+step_size) {
+    
+    pwm.setPWM(servonum, 0, pulselen);
+    delay(speed);
+  }
+
+
   
   
   
