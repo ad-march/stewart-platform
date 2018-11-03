@@ -1,10 +1,10 @@
-rb = 245; %radius of base mm
+rb = 250; %radius of base mm
 angle_offset = 20; %smallest angle between 2 mounts
 rp = rb;
 h = 200;
-l_crank = 140;
+l_crank = 50;
 l_rocker = sqrt(h^2 + l_crank^2);
-n_segments = 45;
+n_segments = 14;
 linewidth = 2;
 x_lim = rb+50;
 y_lim = rb+50;
@@ -12,7 +12,7 @@ y_lim = rb+50;
 Tx=0;
 Ty=0;
 Tz=0;
-alpha=30/n_segments;
+alpha=14/n_segments;
 beta=0/n_segments;
 gamma=0;
 
@@ -48,7 +48,7 @@ for i=0:6
     else
     angle = i*60 - angle_offset;  
     end
-  top(i+1,:) = [rp*cos(deg2rad(angle)), rp*sin(deg2rad(angle)), 0];
+  top(i+1,:) = [rb*cos(deg2rad(angle)), rp*sin(deg2rad(angle)), 0];
 end
 %plot top
 plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);

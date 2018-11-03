@@ -1,8 +1,7 @@
-rb = 245; %radius of base mm
+rb = 150; %radius of base mm
 angle_offset = 20; %smallest angle between 2 mounts
-rp = rb;
 h = 200;
-l_crank = 140;
+l_crank = 150;
 l_rocker = sqrt(h^2 + l_crank^2);
 n_segments = 45;
 linewidth = 2;
@@ -12,7 +11,7 @@ y_lim = rb+50;
 Tx=0;
 Ty=0;
 Tz=0;
-alpha=30/n_segments;
+alpha=1; %1 degree increments
 beta=0/n_segments;
 gamma=0;
 
@@ -29,12 +28,13 @@ B = ones(n_segments, 6); %crank angle?
 for i=0:6
     if mod(i,2)==0 %if i is even
     angle = i*60 + angle_offset;  
-      
+    B(i+1) = deg2rad(angle-90);
+
     else
-    angle = i*60 - angle_offset;  
+    angle = i*60 - angle_offset;
+    B(i+1) = deg2rad(angle+90);
     end
     base(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), -h];
-  B(i+1) = deg2rad(angle+90);
 end
 %plot base
 plot3(base(:,1),base(:,2),base(:,3),'r', 'linewidth', linewidth); %connects the dots
@@ -48,7 +48,7 @@ for i=0:6
     else
     angle = i*60 - angle_offset;  
     end
-  top(i+1,:) = [rp*cos(deg2rad(angle)), rp*sin(deg2rad(angle)), 0];
+  top(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), 0];
 end
 %plot top
 plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
