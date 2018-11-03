@@ -1,9 +1,10 @@
-rb = 245; %radius of base mm
+max_angle = zeros(16,16);
+
 angle_offset = 20; %smallest angle between 2 mounts
 rp = rb;
 h = 200;
 %l_crank = 140;
-l_rocker = sqrt(h^2 + l_crank^2);
+%l_rocker = sqrt(h^2 + l_crank^2);
 n_segments = 45;
 linewidth = 2;
 x_lim = rb+50;
@@ -12,7 +13,7 @@ y_lim = rb+50;
 Tx=0;
 Ty=0;
 Tz=0;
-alpha=45/n_segments;
+%alpha=45/n_segments;
 beta=0/n_segments;
 gamma=0;
 
@@ -36,6 +37,11 @@ T(:,2)=Ty;
 T(:,3)=Tz;
 
 
+rb = 0; %radius of base mm
+for loop_rb = 1:10
+
+rb = rb+25;
+max_angle(loop_rb+1,1) = rb; %rows show rb starting at 2
 
 %base platform
 for i=0:6
@@ -50,10 +56,10 @@ for i=0:6
 end
 %plot base
 %plot3(base(:,1),base(:,2),base(:,3),'r', 'linewidth', linewidth); %connects the dots
-%hold on;
+%hold off;
 
 l_crank = 0;
-for loop_crank = 1:15
+for loop_crank = 1:10
 
 %reset variabes
 l_crank = l_crank + 10;
@@ -61,6 +67,8 @@ l_rocker = sqrt(h^2 + l_crank^2);
 B = ones(n_segments, 6); %crank angle?
 lengths = ones(6,n_segments);
 servo_angle = zeros(6,n_segments);
+
+max_angle(1,loop_crank+1) = l_crank; %columns show l_crank starting at 2
 
 %reset top platform
 for i=0:6
@@ -129,14 +137,13 @@ ylabel('y');
 end
 %%}
 
-max_angle(loop_crank) = j;
-
-
-array = rad2deg(servo_angle);
+max_angle(loop_rb +2,loop_crank +2) = j;
 
 end
 
 
 
+end
 
+surf(max_angle(1,2:10),max_angle(2:10,1),max_angle(2:10,2:10 %3D plot
 
