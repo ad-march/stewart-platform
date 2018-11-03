@@ -136,10 +136,6 @@ plane_angle(i,j+1) = rad2deg(abs( pi/2 - acos( dot(crank-top(i,:), N)/norm(N)/no
 
 end
 
-
-
-
-
 hold off;
 axis([-x_lim x_lim -y_lim y_lim -h-l_crank h]);
 grid on;
@@ -147,15 +143,4 @@ xlabel('x');
 ylabel('y');
 end
 %%}
-
-
-
 array = rad2deg(servo_angle);
-
-
-
-
-
-
-
-
