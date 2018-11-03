@@ -5,9 +5,6 @@ h = 200;
 %l_crank = 140;
 %l_rocker = sqrt(h^2 + l_crank^2);
 n_segments = 45;
-%linewidth = 2;
-%x_lim = rb+50;
-%y_lim = rb+50;
 
 Tx=0;
 Ty=0;
@@ -53,9 +50,6 @@ for i=0:6
     base(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), -h];
   B(i+1) = deg2rad(angle+90);
 end
-%plot base
-%plot3(base(:,1),base(:,2),base(:,3),'r', 'linewidth', linewidth); %connects the dots
-%hold off;
 
 l_crank = 0;
 for loop_crank = 1:15
@@ -83,26 +77,15 @@ for i=0:6
     end
   top(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), 0];
 end
-%plot top
-%plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
-%hold on;
+
 
 %%{
 %move platform
 for j = 1:45 %increment degrees
   
-%pause(0.0001);
-%plot base
-%plot3(base(:,1),base(:,2),base(:,3),'r', 'linewidth', linewidth); %connects the dots
-%hold on;
-
 %update top mount pts
 top = R*transpose(top);
 top = transpose(top)+T;
-
-%plot top
-%plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
-%hold on;
 
 %plots links
 for i=1:6
@@ -116,10 +99,6 @@ crank = [base(i,1) + l_crank*cos(B(i))*cos(servo_angle(i,j+1)), base(i,2) + l_cr
 
 link1 = [top(i,:); crank];
 link2 = [crank;base(i,:)];
-%plot3(link1(:,1),link1(:,2),link1(:,3),'m', 'linewidth', linewidth);
-%hold on;
-%plot3(link2(:,1),link2(:,2),link2(:,3),'c', 'linewidth', linewidth);
-%hold on;
 
 % compute misalignemnt angles
 N = cross([base(i,1) base(i,2) 0] - base(1,:), [base(i,1) base(i,2) 0] - crank);
@@ -143,7 +122,7 @@ end
 
 end
 
-surf(max_angle(1,2:15),max_angle(2:10,1),max_angle(2:10,2:10)) %3D plot
+surf(max_angle(1,2:15),max_angle(2:15,1),max_angle(2:15,2:15)) %3D plot
 xlabel('l_crank');
 ylabel('rb');
 

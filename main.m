@@ -1,13 +1,10 @@
 max_angle = zeros(16,16);
-
+plane_angle = zeros(16,16);
 angle_offset = 20; %smallest angle between 2 mounts
 h = 200;
 %l_crank = 140;
 %l_rocker = sqrt(h^2 + l_crank^2);
 n_segments = 45;
-%linewidth = 2;
-%x_lim = rb+50;
-%y_lim = rb+50;
 
 Tx=0;
 Ty=0;
@@ -41,7 +38,7 @@ for loop_rb = 1:15
 
 rb = rb+25;
 max_angle(loop_rb+1,1) = rb; %rows show rb starting at 2
-
+plane_angle(loop_rb+1,1) = rb;
 %base platform
 for i=0:6
     if mod(i,2)==0 %if i is even
@@ -53,9 +50,6 @@ for i=0:6
     base(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), -h];
   B(i+1) = deg2rad(angle+90);
 end
-%plot base
-%plot3(base(:,1),base(:,2),base(:,3),'r', 'linewidth', linewidth); %connects the dots
-%hold off;
 
 l_crank = 0;
 for loop_crank = 1:15
@@ -68,10 +62,13 @@ lengths = ones(6,n_segments);
 servo_angle = zeros(6,n_segments);
 
 max_angle(1,loop_crank+1) = l_crank; %columns show l_crank starting at 2
+plane_angle(1,loop_crank+1) = l_crank;
 
+%{
 if l_crank > rb
     continue
 end
+%}
 
 %reset top platform
 for i=0:6
@@ -83,26 +80,15 @@ for i=0:6
     end
   top(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), 0];
 end
-%plot top
-%plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
-%hold on;
+
 
 %%{
 %move platform
 for j = 1:45 %increment degrees
   
-%pause(0.0001);
-%plot base
-%plot3(base(:,1),base(:,2),base(:,3),'r', 'linewidth', linewidth); %connects the dots
-%hold on;
-
 %update top mount pts
 top = R*transpose(top);
 top = transpose(top)+T;
-
-%plot top
-%plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
-%hold on;
 
 %plots links
 for i=1:6
@@ -116,16 +102,16 @@ crank = [base(i,1) + l_crank*cos(B(i))*cos(servo_angle(i,j+1)), base(i,2) + l_cr
 
 link1 = [top(i,:); crank];
 link2 = [crank;base(i,:)];
-%plot3(link1(:,1),link1(:,2),link1(:,3),'m', 'linewidth', linewidth);
-%hold on;
-%plot3(link2(:,1),link2(:,2),link2(:,3),'c', 'linewidth', linewidth);
-%hold on;
 
 % compute misalignemnt angles
 N = cross([base(i,1) base(i,2) 0] - base(1,:), [base(i,1) base(i,2) 0] - crank);
 %// angle between plane and line, equals pi/2 - angle between D-E and N
-plane_angle(i,j+1) = rad2deg(abs( pi/2 - acos( dot(crank-top(i,:), N)/norm(N)/norm(crank-top(i,:)) ) ));
+temp_angle = rad2deg(abs( pi/2 - acos( dot(crank-top(i,:), N)/norm(N)/norm(crank-top(i,:)) ) ));
 
+%fill array with largest misalignemnt angle
+    if temp_angle > plane_angle(loop_rb +1,loop_crank +1)    
+        plane_angle(loop_rb +1,loop_crank +1) = temp_angle;
+    end
 end
 
     if isreal(servo_angle)==0
