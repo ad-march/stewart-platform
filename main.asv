@@ -1,5 +1,7 @@
-max_angle = zeros(16,16);
-
+x_size = 13;
+y_size = 10;
+max_angle = zeros(x_size,y_size);
+plane_angle = zeros(x_size,y_size);
 angle_offset = 20; %smallest angle between 2 mounts
 h = 200;
 %l_crank = 140;
@@ -33,39 +35,41 @@ T(:,2)=Ty;
 T(:,3)=Tz;
 
 
-rb = 0; %radius of base mm
-for loop_rb = 1:15
+rb = 100; %radius of base mm
+for loop_rb = 1:
 
 rb = rb+25;
 max_angle(loop_rb+1,1) = rb; %rows show rb starting at 2
-
+plane_angle(loop_rb+1,1) = rb;
 %base platform
 for i=0:6
     if mod(i,2)==0 %if i is even
     angle = i*60 + angle_offset;  
-      
+    B(i+1) = deg2rad(angle-90);
     else
-    angle = i*60 - angle_offset;  
+    angle = i*60 - angle_offset; 
+    B(i+1) = deg2rad(angle+90);
     end
     base(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), -h];
-  B(i+1) = deg2rad(angle+90);
 end
 
 l_crank = 0;
-for loop_crank = 1:15
+for loop_crank = 1:10
     
 %reset variabes
 l_crank = l_crank + 10;
 l_rocker = sqrt(h^2 + l_crank^2);
-B = ones(n_segments, 6); %crank angle?
 lengths = ones(6,n_segments);
 servo_angle = zeros(6,n_segments);
 
 max_angle(1,loop_crank+1) = l_crank; %columns show l_crank starting at 2
+plane_angle(1,loop_crank+1) = l_crank;
 
+%{
 if l_crank > rb
     continue
 end
+%}
 
 %reset top platform
 for i=0:6
@@ -103,8 +107,12 @@ link2 = [crank;base(i,:)];
 % compute misalignemnt angles
 N = cross([base(i,1) base(i,2) 0] - base(1,:), [base(i,1) base(i,2) 0] - crank);
 %// angle between plane and line, equals pi/2 - angle between D-E and N
-plane_angle(i,j+1) = rad2deg(abs( pi/2 - acos( dot(crank-top(i,:), N)/norm(N)/norm(crank-top(i,:)) ) ));
+temp_angle = rad2deg(abs( pi/2 - acos( dot(crank-top(i,:), N)/norm(N)/norm(crank-top(i,:)) ) ));
 
+%fill array with largest misalignemnt angle
+    if temp_angle > plane_angle(loop_rb +1,loop_crank +1)    
+        plane_angle(loop_rb +1,loop_crank +1) = temp_angle;
+    end
 end
 
     if isreal(servo_angle)==0
@@ -123,6 +131,5 @@ end
 end
 
 surf(max_angle(1,2:15),max_angle(2:15,1),max_angle(2:15,2:15)) %3D plot
-xlabel('l_crank');
-ylabel('rb');
-
+xlabel('Crank Length');
+ylabel('Base Radius');

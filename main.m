@@ -1,5 +1,7 @@
-max_angle = zeros(16,16);
-plane_angle = zeros(16,16);
+x_size = 14;
+y_size = 11;
+max_angle = zeros(x_size,y_size);
+plane_angle = zeros(x_size,y_size);
 angle_offset = 20; %smallest angle between 2 mounts
 h = 200;
 %l_crank = 140;
@@ -33,8 +35,8 @@ T(:,2)=Ty;
 T(:,3)=Tz;
 
 
-rb = 0; %radius of base mm
-for loop_rb = 1:15
+rb = 75; %radius of base mm
+for loop_rb = 1:x_size-1
 
 rb = rb+25;
 max_angle(loop_rb+1,1) = rb; %rows show rb starting at 2
@@ -43,21 +45,20 @@ plane_angle(loop_rb+1,1) = rb;
 for i=0:6
     if mod(i,2)==0 %if i is even
     angle = i*60 + angle_offset;  
-      
+    B(i+1) = deg2rad(angle-90);
     else
-    angle = i*60 - angle_offset;  
+    angle = i*60 - angle_offset; 
+    B(i+1) = deg2rad(angle+90);
     end
     base(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), -h];
-  B(i+1) = deg2rad(angle+90);
 end
 
 l_crank = 0;
-for loop_crank = 1:15
+for loop_crank = 1:y_size-1
     
 %reset variabes
 l_crank = l_crank + 10;
 l_rocker = sqrt(h^2 + l_crank^2);
-B = ones(n_segments, 6); %crank angle?
 lengths = ones(6,n_segments);
 servo_angle = zeros(6,n_segments);
 
@@ -129,7 +130,6 @@ end
 
 end
 
-surf(max_angle(1,2:15),max_angle(2:15,1),max_angle(2:15,2:15)) %3D plot
-xlabel('l_crank');
-ylabel('rb');
-
+surf(max_angle(1,2:y_size),max_angle(2:x_size,1),max_angle(2:x_size,2:y_size)) %3D plot
+xlabel('Crank Length');
+ylabel('Base Radius');
