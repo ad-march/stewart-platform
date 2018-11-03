@@ -1,14 +1,13 @@
 max_angle = zeros(16,16);
 
 angle_offset = 20; %smallest angle between 2 mounts
-rp = rb;
 h = 200;
 %l_crank = 140;
 %l_rocker = sqrt(h^2 + l_crank^2);
 n_segments = 45;
-linewidth = 2;
-x_lim = rb+50;
-y_lim = rb+50;
+%linewidth = 2;
+%x_lim = rb+50;
+%y_lim = rb+50;
 
 Tx=0;
 Ty=0;
@@ -38,7 +37,7 @@ T(:,3)=Tz;
 
 
 rb = 0; %radius of base mm
-for loop_rb = 1:10
+for loop_rb = 1:15
 
 rb = rb+25;
 max_angle(loop_rb+1,1) = rb; %rows show rb starting at 2
@@ -59,8 +58,8 @@ end
 %hold off;
 
 l_crank = 0;
-for loop_crank = 1:10
-
+for loop_crank = 1:15
+    
 %reset variabes
 l_crank = l_crank + 10;
 l_rocker = sqrt(h^2 + l_crank^2);
@@ -70,6 +69,10 @@ servo_angle = zeros(6,n_segments);
 
 max_angle(1,loop_crank+1) = l_crank; %columns show l_crank starting at 2
 
+if l_crank > rb
+    continue
+end
+
 %reset top platform
 for i=0:6
     if mod(i,2)==0 %if i is even
@@ -78,7 +81,7 @@ for i=0:6
     else
     angle = i*60 - angle_offset;  
     end
-  top(i+1,:) = [rp*cos(deg2rad(angle)), rp*sin(deg2rad(angle)), 0];
+  top(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), 0];
 end
 %plot top
 %plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
@@ -86,7 +89,7 @@ end
 
 %%{
 %move platform
-for j = 1:45
+for j = 1:45 %increment degrees
   
 %pause(0.0001);
 %plot base
@@ -129,15 +132,10 @@ end
         break
     end
 
-hold off;
-axis([-x_lim x_lim -y_lim y_lim -h-l_crank h]);
-grid on;
-xlabel('x');
-ylabel('y');
 end
 %%}
 
-max_angle(loop_rb +2,loop_crank +2) = j;
+max_angle(loop_rb +1,loop_crank +1) = j;
 
 end
 
@@ -145,5 +143,7 @@ end
 
 end
 
-surf(max_angle(1,2:10),max_angle(2:10,1),max_angle(2:10,2:10 %3D plot
+surf(max_angle(1,2:15),max_angle(2:15,1),max_angle(2:15,2:15)) %3D plot
+xlabel('l_crank');
+ylabel('rb');
 
