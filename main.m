@@ -2,10 +2,10 @@ x_size = 14;
 y_size = 11;
 max_angle = zeros(x_size,y_size);
 plane_angle = zeros(x_size,y_size);
+max_load = zeros(x_size,y_size);
+
 angle_offset = 20; %smallest angle between 2 mounts
 h = 200;
-%l_crank = 140;
-%l_rocker = sqrt(h^2 + l_crank^2);
 n_segments = 45;
 
 Tx=0;
@@ -41,6 +41,7 @@ for loop_rb = 1:x_size-1
 rb = rb+25;
 max_angle(loop_rb+1,1) = rb; %rows show rb starting at 2
 plane_angle(loop_rb+1,1) = rb;
+max_load(loop_rb+1,1) = rb;
 %base platform
 for i=0:6
     if mod(i,2)==0 %if i is even
@@ -64,6 +65,7 @@ servo_angle = zeros(6,n_segments);
 
 max_angle(1,loop_crank+1) = l_crank; %columns show l_crank starting at 2
 plane_angle(1,loop_crank+1) = l_crank;
+max_load(1,loop_crank+1) = l_crank;
 
 %{
 if l_crank > rb
@@ -121,15 +123,14 @@ end
 
 end
 %%}
-
+max_load(loop_rb +1,loop_crank +1) = loads_function(l_crank,l_rocker);
 max_angle(loop_rb +1,loop_crank +1) = j;
 
 end
-
-
 
 end
 
 surf(max_angle(1,2:y_size),max_angle(2:x_size,1),max_angle(2:x_size,2:y_size)) %3D plot
 xlabel('Crank Length');
 ylabel('Base Radius');
+zlabel('Max Angle');
