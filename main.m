@@ -81,7 +81,6 @@ end
 axis([-x_lim x_lim -y_lim y_lim -h-l_crank h]);
 grid on;
 hold off;
-  
 
 %%{
 %move platform
