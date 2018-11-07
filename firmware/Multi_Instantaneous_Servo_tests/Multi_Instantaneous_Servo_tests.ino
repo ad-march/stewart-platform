@@ -8,12 +8,16 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 int servonum = 0;
 const int servo_quantity = 6;
-const int steps_quantity = 3;
-double speed = 0.5;
+const int steps_quantity = 7;
+double speed = 1;    //speed factor = number of degrees per step
 double current_angle [] = {150,150,150,535,535,535};
 double target_angle [][servo_quantity] = {{250, 500, 490, 400, 200, 300},
                                           {210, 400, 150, 400, 500, 425},
-                                          {500, 300, 350, 500, 300, 350}};
+                                          {300, 300, 350, 500, 300, 350},
+                                          {200, 300, 500, 200, 300, 250},
+                                          {500, 250, 150, 150, 320, 450},
+                                          {400, 300, 520, 500, 300, 350},
+                                          {500, 520, 350, 350, 340, 150}};
 
 void setup() {
   Serial.begin(9600);
@@ -51,7 +55,7 @@ for (int b = 0; b < steps_quantity; b++){
   // Split into step sizes for same total move time
   double step_size [servo_quantity];
    for (int j = 0; j < servo_quantity; j++) {
-    step_size[j] = (target_angle[b][j]-current_angle[j])/max_diff;
+    step_size[j] = speed*(target_angle[b][j]-current_angle[j])/max_diff;
    }
   
   
@@ -65,7 +69,6 @@ for (int b = 0; b < steps_quantity; b++){
     //double pulselen = map (current_angle[k], 0, 180, SERVOMIN, SERVOMAX);
     //pwm.setPWM(k, 0, pulselen);
     pwm.setPWM(k, 0, current_angle[k]);
-    delay(speed);
   
     Serial.flush();
    }
