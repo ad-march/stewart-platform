@@ -1,9 +1,9 @@
-rb = 150; %radius of base mm
-angle_offset = 20; %smallest angle between 2 mounts
+rb = 125; %radius of base mm
+angle_offset = 30-5; %smallest angle between 2 mounts
 h = 200;
-l_crank = 150;
+l_crank = 60;
 l_rocker = sqrt(h^2 + l_crank^2);
-n_segments = 45;
+n_segments = 30;
 linewidth = 2;
 x_lim = rb+50;
 y_lim = rb+50;
@@ -140,6 +140,7 @@ axis([-x_lim x_lim -y_lim y_lim -h-l_crank h]);
 grid on;
 xlabel('x');
 ylabel('y');
+zlabel('z');
 end
 %%}
 array = rad2deg(servo_angle);
