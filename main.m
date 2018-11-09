@@ -1,4 +1,4 @@
-x_size = 14;
+x_size = 10;
 y_size = 11;
 max_angle = zeros(x_size,y_size);
 plane_angle = zeros(x_size,y_size);
@@ -35,7 +35,7 @@ T(:,2)=Ty;
 T(:,3)=Tz;
 
 
-rb = 75; %radius of base mm
+rb = 25; %radius of base mm
 for loop_rb = 1:x_size-1
 
 rb = rb+25;
@@ -131,6 +131,6 @@ end
 end
 
 surf(max_angle(1,2:y_size),max_angle(2:x_size,1),max_angle(2:x_size,2:y_size)) %3D plot
-xlabel('Crank Length');
-ylabel('Base Radius');
-zlabel('Max Angle');
+xlabel('Crank Length (mm)');
+ylabel('Base Radius (mm)');
+zlabel('Max Angle (deg)');
