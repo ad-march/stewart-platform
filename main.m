@@ -1,15 +1,15 @@
 rb = 125; %radius of base mm
-angle_offset = 30-5; %smallest angle between 2 mounts
+angle_offset = 30-15.63/2; %smallest angle between 2 mounts
 h = 200;
 l_crank = 60;
 l_rocker = sqrt(h^2 + l_crank^2);
-n_segments = 30;
+n_segments = 28;
 linewidth = 2;
 x_lim = rb+50;
 y_lim = rb+50;
 
 Tx=0;
-Ty=0;
+Ty=35.8/n_segments;
 Tz=0;
 alpha=1; %1 degree increments
 beta=0/n_segments;
