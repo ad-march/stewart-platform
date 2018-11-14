@@ -9,7 +9,7 @@ h = 200;
 n_segments = 45;
 
 Tx=0;
-Ty=0;
+Ty=35.8;
 Tz=0;
 %alpha=45/n_segments;
 beta=0/n_segments;
@@ -84,14 +84,14 @@ for i=0:6
   top(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), 0];
 end
 
-
+top = top + T;
 %%{
 %move platform
 for j = 1:45 %increment degrees
   
 %update top mount pts
 top = R*transpose(top);
-top = transpose(top)+T;
+top = transpose(top);
 
 %plots links
 for i=1:6
