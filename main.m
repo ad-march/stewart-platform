@@ -1,15 +1,15 @@
 rb = 125; %radius of base mm
 angle_offset = 30-15.63/2; %smallest angle between 2 mounts
 h = 200;
-l_crank = 60;
+l_crank = 70;
 l_rocker = sqrt(h^2 + l_crank^2);
-n_segments = 28;
+n_segments = 30;
 linewidth = 2;
 x_lim = rb+50;
 y_lim = rb+50;
 
 Tx=0;
-Ty=35.8/n_segments;
+Ty=35.8;
 Tz=0;
 alpha=1; %1 degree increments
 beta=0/n_segments;
@@ -105,7 +105,7 @@ T(:,3)=Tz;
 
 %update top mount pts
 top = R*transpose(top);
-top = transpose(top)+T;
+top = transpose(top);
 
 %plot top
 plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
@@ -141,6 +141,49 @@ grid on;
 xlabel('x');
 ylabel('y');
 zlabel('z');
+
 end
 %%}
+%translation matrix
+T(:,1)=Tx;
+T(:,2)=Ty;
+T(:,3)=Tz;
+
+top = top + T;
+
+%plot top
+plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
+hold on;
+
+%plots links
+for i=1:6
+lengths(i) = norm(top(i,:) - base(i,:));
+M = 2*l_crank*(top(i,3)-base(i,3));
+N = 2*l_crank*(cos(B(i))*(top(i,1)-base(i,1)) + sin(B(i))*(top(i,2)-base(i,2)));
+L=lengths(i)^2-(l_rocker^2-l_crank^2);
+servo_angle(i,j+1) = asin(L/sqrt(M^2+N^2)) - atan(N/M);
+crank = [base(i,1) + l_crank*cos(B(i))*cos(servo_angle(i,j+1)), base(i,2) + l_crank*cos(servo_angle(i,j+1))*sin(B(i)),...
+        base(i,3) + l_crank*sin(servo_angle(i,j+1))];
+
+link1 = [top(i,:); crank];
+link2 = [crank;base(i,:)];
+plot3(link1(:,1),link1(:,2),link1(:,3),'m', 'linewidth', linewidth);
+hold on;
+plot3(link2(:,1),link2(:,2),link2(:,3),'c', 'linewidth', linewidth);
+hold on;
+
+% compute misalignemnt angles
+N = cross([base(i,1) base(i,2) 0] - base(1,:), [base(i,1) base(i,2) 0] - crank);
+%// angle between plane and line, equals pi/2 - angle between D-E and N
+plane_angle(i,j+1) = rad2deg(abs( pi/2 - acos( dot(crank-top(i,:), N)/norm(N)/norm(crank-top(i,:)) ) ));
+
+end
+
+hold off;
+axis([-x_lim x_lim -y_lim y_lim -h-l_crank h]);
+grid on;
+xlabel('x');
+ylabel('y');
+zlabel('z');
+
 array = rad2deg(servo_angle);
