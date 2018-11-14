@@ -4,7 +4,7 @@ max_angle = zeros(x_size,y_size);
 plane_angle = zeros(x_size,y_size);
 max_load = zeros(x_size,y_size);
 
-angle_offset = 20; %smallest angle between 2 mounts
+angle_offset = 30-15.63/2; %smallest angle between 2 mounts
 h = 200;
 n_segments = 45;
 
@@ -73,7 +73,7 @@ if l_crank > rb
 end
 %}
 
-%reset top platform
+%reset top platform 
 for i=0:6
     if mod(i,2)==0 %if i is even
     angle = i*60 + angle_offset;  
