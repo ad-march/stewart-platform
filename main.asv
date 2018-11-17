@@ -1,50 +1,19 @@
-function M12 = loads(l_crank,l_rocker)
-r2 = 0.01; %crank
-r3 = sqrt(h^2+r2^2); %rocker
-%b3 = r3/2;
-omega2 = -50*2*pi/60; %50rpm = no load speed
-m2 = 0;
-m3 = 0;
-m4 = 0.3;
-I3 = 1/12 * m3*r3^2;
-F = m4*9.81;
-
-r2 = l_crank/1000; %crank m
-r3 = l_rocker/1000; %rocker m
-b3 = r3/2; %dist to cg
-theta2 = 0;%servo angle for max load
-
-theta3 = acos(-r2*cos(theta2)/r3);
-omega3 = -(omega2*r2*sin(theta2))/(r3*sin(theta3));
-alpha3 = ( -(omega2^2*r2*cos(theta2))-(omega3*r3*cos(theta3)) ) / (r3*sin(theta3));
-ag4y=(omega2^2 *r2*sin(theta2)) + (omega3^2 *r3*sin(theta3)) - (alpha3*r3*cos(theta3));
-ag3x = -(omega2^2*r2*cos(theta2))-(omega3^2*b3*cos(theta3))-(alpha3*b3*sin(theta3));
-ag3y = -(omega2^2*r2*sin(theta2))-(omega3^2*b3*sin(theta3))+(alpha3*b3*cos(theta3));
-
-F34Y = F - m4*ag4y;
-F23Y = m3*ag3y-F34Y;
-F23X = (I3*alpha3 + F23Y*b3*sin(theta3-pi/2) - F34Y*(r3-b3)*sin(theta3-pi/2) + m3*ag3x*(r3-b3)*cos(theta3-pi/2)) / (b3*cos(theta3-pi/2)+(r3-b3)*cos(theta3-pi/2));
-F34X = m3*ag3x - F23X;
-
-M12 = -F23X*(r2*sin(theta2)) - F23Y*(r2*cos(theta2));
-end
-
-
-x_size = 14;
+x_size = 10;
 y_size = 11;
 max_angle = zeros(x_size,y_size);
 plane_angle = zeros(x_size,y_size);
 max_load = zeros(x_size,y_size);
 
-angle_offset = 20; %smallest angle between 2 mounts
+angle_offset = 30-15.63/2; %smallest angle between 2 mounts
 h = 200;
-%l_crank = 140;
-%l_rocker = sqrt(h^2 + l_crank^2);
 n_segments = 45;
 
 Tx=0;
-Ty=0;
+Ty=35.8;
 Tz=0;
+
+platform_center = [Tx Ty Tz];
+
 %alpha=45/n_segments;
 beta=0/n_segments;
 gamma=0;
@@ -63,13 +32,10 @@ R_x = [1,0,0 ; 0, cos(deg2rad(alpha)), sin(deg2rad(alpha)); 0, -sin(deg2rad(alph
 R_y = [ cos(deg2rad(beta)),0, -sin(deg2rad(beta)); 0,1,0 ; sin(deg2rad(beta)),0, cos(deg2rad(beta))];
 R_z = [cos(deg2rad(gamma)), sin(deg2rad(gamma)), 0; -sin(deg2rad(gamma)), cos(deg2rad(gamma)),0; 0,0,1];
 R = R_x * R_y * R_z ;
-%translation matrix
-T(:,1)=Tx;
-T(:,2)=Ty;
-T(:,3)=Tz;
 
 
-rb = 75; %radius of base mm
+
+rb = 25; %radius of base mm
 for loop_rb = 1:x_size-1
 
 rb = rb+25;
@@ -107,7 +73,7 @@ if l_crank > rb
 end
 %}
 
-%reset top platform
+%reset top platform 
 for i=0:6
     if mod(i,2)==0 %if i is even
     angle = i*60 + angle_offset;  
@@ -118,14 +84,15 @@ for i=0:6
   top(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), 0];
 end
 
-
+top = top + ones(7,3)*platform;
 %%{
 %move platform
 for j = 1:45 %increment degrees
   
 %update top mount pts
-top = R*transpose(top);
-top = transpose(top)+T;
+%to rotate around its own axis, it translates itself back to the origin,rotates and then translates back
+top = transpose(R*transpose(top - ones(7,3).*platform_center)) + ones(7,3).*(platform_center);
+
 
 %plots links
 for i=1:6
@@ -157,15 +124,14 @@ end
 
 end
 %%}
-
+max_load(loop_rb +1,loop_crank +1) = loads_function(l_crank,l_rocker);
 max_angle(loop_rb +1,loop_crank +1) = j;
 
 end
 
-
-
 end
 
 surf(max_angle(1,2:y_size),max_angle(2:x_size,1),max_angle(2:x_size,2:y_size)) %3D plot
-xlabel('Crank Length');
-ylabel('Base Radius');
+xlabel('Crank Length (mm)');
+ylabel('Base Radius (mm)');
+zlabel('Max Angle (deg)');

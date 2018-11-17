@@ -11,6 +11,9 @@ n_segments = 45;
 Tx=0;
 Ty=35.8;
 Tz=0;
+
+platform_center = [Tx Ty Tz];
+
 %alpha=45/n_segments;
 beta=0/n_segments;
 gamma=0;
@@ -29,10 +32,7 @@ R_x = [1,0,0 ; 0, cos(deg2rad(alpha)), sin(deg2rad(alpha)); 0, -sin(deg2rad(alph
 R_y = [ cos(deg2rad(beta)),0, -sin(deg2rad(beta)); 0,1,0 ; sin(deg2rad(beta)),0, cos(deg2rad(beta))];
 R_z = [cos(deg2rad(gamma)), sin(deg2rad(gamma)), 0; -sin(deg2rad(gamma)), cos(deg2rad(gamma)),0; 0,0,1];
 R = R_x * R_y * R_z ;
-%translation matrix
-T(:,1)=Tx;
-T(:,2)=Ty;
-T(:,3)=Tz;
+
 
 
 rb = 25; %radius of base mm
@@ -84,14 +84,15 @@ for i=0:6
   top(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), 0];
 end
 
-top = top + T;
+top = top + ones(7,3).*platform_center;
 %%{
 %move platform
 for j = 1:45 %increment degrees
   
 %update top mount pts
-top = R*transpose(top);
-top = transpose(top);
+%to rotate around its own axis, it translates itself back to the origin,rotates and then translates back
+top = transpose(R*transpose(top - ones(7,3).*platform_center)) + ones(7,3).*(platform_center);
+
 
 %plots links
 for i=1:6
