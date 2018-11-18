@@ -135,3 +135,9 @@ surf(max_angle(1,2:y_size),max_angle(2:x_size,1),max_angle(2:x_size,2:y_size)) %
 xlabel('Crank Length (mm)');
 ylabel('Base Radius (mm)');
 zlabel('Max Angle (deg)');
+
+max_load(2,1)=0;
+plot(max_load(1,:),max_load(2,:));
+title('Servo Loads vs Crank Length');
+xlabel('Crank Length (mm)');
+ylabel('Max Servo Load (Nm)');

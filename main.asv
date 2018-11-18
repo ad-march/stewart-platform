@@ -84,7 +84,7 @@ for i=0:6
   top(i+1,:) = [rb*cos(deg2rad(angle)), rb*sin(deg2rad(angle)), 0];
 end
 
-top = top + ones(7,3)*platform;
+top = top + ones(7,3).*platform_center;
 %%{
 %move platform
 for j = 1:45 %increment degrees
@@ -135,3 +135,5 @@ surf(max_angle(1,2:y_size),max_angle(2:x_size,1),max_angle(2:x_size,2:y_size)) %
 xlabel('Crank Length (mm)');
 ylabel('Base Radius (mm)');
 zlabel('Max Angle (deg)');
+
+plot(servo_loads(1,:),max_angle(1,:);
