@@ -16,27 +16,26 @@ void setup() {
   pwm.begin();
   
   pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
+
+   delay(2000);
+   pwm.setPWM(0, 0, SERVOMAX);
+   Serial.flush();
+
+  delay(2000);
+    
+    
+for (int c = 550; c > 200; c--){
+    pwm.setPWM(0, 0, c);
+    Serial.flush();
+    delay(20);
+  }
+  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
-   delay(2000);
-   pwm.setPWM(6, 0, SERVOMAX);
-   Serial.flush();
 
-  delay(2000);
-     
-  for (int j = SERVOMAX; j > SERVOMIN; j--){
-      pwm.setPWM(6, 0, j);
-      Serial.flush();
-      delay(10);
-    }
-    
-  for (int i = SERVOMIN; i < SERVOMAX; i++){
-    pwm.setPWM(6, 0, i);
-    Serial.flush();
-  }
 
   
   
