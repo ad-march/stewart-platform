@@ -10,7 +10,7 @@ int SERVOMEAN[] = {330,305,330,315,340,315};
 int servonum = 0;
 const int servo_quantity = 6;
 const int steps_quantity = 6;
-double speed = 1;    //speed factor = number of degrees per step
+double speed = 0.5;    //speed factor = number of degrees per step
 double current_angle [] = {0,0,0,0,0,0};
 double target_angle [][servo_quantity] = {{-3.453072574,-5.502042113,-5.502042113,-3.453072574,8.623984679,8.623984679},
                                           {-7.065621827,-11.06994714,-11.06994714,-7.065621827,16.9359821,16.9359821},
@@ -29,7 +29,7 @@ void setup() {
 
   for (int a = 0; a < servo_quantity; a++){
     double pulselen = map (current_angle[a], 0, 80, SERVOMEAN[a], SERVOMAX[a]);
-    pwm.setPWM(a+1, 0, pulselen);
+    pwm.setPWM(a+10, 0, pulselen);
     Serial.flush();
   
   pwm.setPWM(0, 0, 550);
@@ -71,7 +71,7 @@ for (int b = 0; b < steps_quantity; b++){
       
       current_angle[k] = current_angle[k] + step_size[k];
       double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k], SERVOMAX[k]);
-      pwm.setPWM(k+1, 0, pulselen);
+      pwm.setPWM(k+10, 0, pulselen);
      // pwm.setPWM(k+1, 0, current_angle[k]);
     
       Serial.flush();
@@ -85,7 +85,7 @@ for (int b = 0; b < steps_quantity; b++){
       
       current_angle[k] = current_angle[k] + step_size[k];
       double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k], SERVOMAX[k]);
-      pwm.setPWM(k+1, 0, pulselen);
+      pwm.setPWM(k+10, 0, pulselen);
      // pwm.setPWM(k+1, 0, current_angle[k]);
     
       Serial.flush();
