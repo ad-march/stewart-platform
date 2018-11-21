@@ -3,8 +3,9 @@
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 //Servo calibration:
-#define SERVOMIN  132
-#define SERVOMAX  535
+int SERVOMIN[] = {400,230,400,230,400,230};
+int SERVOMAX[] = {170,470,170,475,175,470};
+int SERVOMEAN[] = {330,300,335,300,340,305};
 
 int servonum = 0;
 const int servo_quantity = 6;
@@ -66,7 +67,7 @@ for (int b = 0; b < steps_quantity; b++){
    for (int k = 0; k < servo_quantity; k++){
     
     current_angle[k] = current_angle[k] + step_size[k];
-    //double pulselen = map (current_angle[k], 0, 180, SERVOMIN, SERVOMAX);
+    //double pulselen = map (current_angle[k], 0, 180, SERVOMIN[k], SERVOMAX[k]);
     //pwm.setPWM(k, 0, pulselen);
     pwm.setPWM(k, 0, current_angle[k]);
   
