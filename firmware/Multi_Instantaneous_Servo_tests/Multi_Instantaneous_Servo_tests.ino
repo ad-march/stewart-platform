@@ -3,9 +3,9 @@
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 //Servo calibration:
-int SERVOMIN[] = {400,230,400,230,400,230};
-int SERVOMAX[] = {170,470,170,475,175,470};
-int SERVOMEAN[] = {330,300,335,300,340,305};
+int SERVOMIN[] = {410,225,410,240,415,230};
+int SERVOMAX[] = {190,460,185,465,190,460};
+int SERVOMEAN[] = {330,305,330,315,340,315};
 
 int servonum = 0;
 const int servo_quantity = 6;
