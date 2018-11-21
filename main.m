@@ -11,8 +11,9 @@ linewidth = 2;
 x_lim = rb+50;
 y_lim = rb+50;
 
+degree_increment = 5;
 %n_segments = 30;% number of degrees rotation
-n_segments = 30/5;
+n_segments = 30/degree_increment;
 %translation vector
 Tx=0/n_segments;
 Ty=0/n_segments;
@@ -20,8 +21,8 @@ Tz=0;
 T = [Tx Ty Tz];
 
 %rotation matrix
-alpha=5; %1 degree increments
-beta=0;
+alpha=degree_increment; %1 degree increments
+beta=0/n_segments;
 gamma=0;
 R_x = [1,0,0 ; 0, cos(deg2rad(alpha)), sin(deg2rad(alpha)); 0, -sin(deg2rad(alpha)), cos(deg2rad(alpha))];
 R_y = [ cos(deg2rad(beta)),0, -sin(deg2rad(beta)); 0,1,0 ; sin(deg2rad(beta)),0, cos(deg2rad(beta))];
@@ -146,42 +147,46 @@ zlabel('z');
 end
 
 servo_angles_degrees = transpose(rad2deg(servo_angle));
+asize = size(servo_angles_degrees);
 
 
-filename = 'servo_data.csv';
-csvwrite(filename,servo_angles_degrees,1,1);
+
+
 %{
-for i=1:100
+filename = 'servo_data.csv';
+csvwrite(filename,servo_angles_degrees,0,0);
+
+
+for i=1:asize(1)
 bracket_left(i)='(';
 bracket_right(i)=')';
 end
+newdata = strcat(transpose(bracket_left),servo_angles_degrees);
 csvwrite(filename,transpose(bracket_left));
-
+%}
 
 
 %redefine motion
-
-n_segments = 30;% number of degrees rotation
-
 %translation vector
 Tx=0;
-Ty=-35.8/n_segments;
+Ty=0/n_segments;
 Tz=0;
 T = [Tx Ty Tz];
 
 %rotation matrix
-alpha=-1; %1 degree increments
-beta=1;
+alpha=-degree_increment; 
+beta=0;
 gamma=0;
 R_x = [1,0,0 ; 0, cos(deg2rad(alpha)), sin(deg2rad(alpha)); 0, -sin(deg2rad(alpha)), cos(deg2rad(alpha))];
 R_y = [ cos(deg2rad(beta)),0, -sin(deg2rad(beta)); 0,1,0 ; sin(deg2rad(beta)),0, cos(deg2rad(beta))];
 R_z = [cos(deg2rad(gamma)), sin(deg2rad(gamma)), 0; -sin(deg2rad(gamma)), cos(deg2rad(gamma)),0; 0,0,1];
 R = R_x * R_y * R_z ;
 
+%%{
 %move platform - motion divided into n_segments
 for j=1:n_segments
 
-pause(0.0001);
+pause(0.001);
 
 %update top mount pts
 %to rotate around its own axis, it translates itself back to the origin,rotates and then translates back
@@ -228,4 +233,6 @@ ylabel('y');
 zlabel('z');
 
 end
+servo_angles_degrees(asize(1)+1:asize(1)+1+n_segments,:) = transpose(rad2deg(servo_angle));
+
 %}
