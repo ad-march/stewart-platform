@@ -9,16 +9,15 @@ int SERVOMEAN[] = {330,305,330,315,340,315};
 
 int servonum = 0;
 const int servo_quantity = 6;
-const int steps_quantity = 7;
-double speed = 0.5;    //speed factor = number of degrees per step
+const int steps_quantity = 6;
+double speed = 1;    //speed factor = number of degrees per step
 double current_angle [] = {0,0,0,0,0,0};
-double target_angle [][servo_quantity] = {{10, 20, 30, 40, -50, 60},
-                                          {40, 20, 20, 40, 50, 45},
-                                          {20, 30, 50, 50, -50, 35},
-                                          {-30, 60, 85, 20, 30, 25},
-                                          {-50, 0, 0, 15, 32, 45},
-                                          {-20, -10, 20, 50, -30, 35},
-                                          {0, -30, -50, 35, -34, 15}};
+double target_angle [][servo_quantity] = {{-3.453072574,-5.502042113,-5.502042113,-3.453072574,8.623984679,8.623984679},
+                                          {-7.065621827,-11.06994714,-11.06994714,-7.065621827,16.9359821,16.9359821},
+                                          {-10.82936654,-16.72205945,-16.72205945,-10.82936654,25.12353262,25.12353262},
+                                          {-10.82936654,-16.72205945,-16.72205945,-10.82936654,25.12353262,25.12353262},
+                                          {-18.75419332,-28.3878174,-28.3878174,-18.75419332,42.01272326,42.01272326},
+                                          {-22.87108763,-34.4917331,-34.4917331,-22.87108763,51.45749229,51.45749229}};
 
 void setup() {
   Serial.begin(9600);
@@ -29,9 +28,13 @@ void setup() {
   pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
 
   for (int a = 0; a < servo_quantity; a++){
-    double pulselen = map (current_angle[a], -57, 90, SERVOMIN[a], SERVOMAX[a]);
+    double pulselen = map (current_angle[a], 0, 80, SERVOMEAN[a], SERVOMAX[a]);
     pwm.setPWM(a+1, 0, pulselen);
     Serial.flush();
+  
+  pwm.setPWM(0, 0, 550);
+    Serial.flush();
+    
   }
 
   delay(2000);
@@ -67,7 +70,7 @@ for (int b = 0; b < steps_quantity; b++){
      for (int k = 0; k < servo_quantity; k++){
       
       current_angle[k] = current_angle[k] + step_size[k];
-      double pulselen = map (current_angle[k], -57, 90, SERVOMIN[k], SERVOMAX[k]);
+      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k], SERVOMAX[k]);
       pwm.setPWM(k+1, 0, pulselen);
      // pwm.setPWM(k+1, 0, current_angle[k]);
     
@@ -81,7 +84,7 @@ for (int b = 0; b < steps_quantity; b++){
      for (int k = 0; k < servo_quantity; k++){
       
       current_angle[k] = current_angle[k] + step_size[k];
-      double pulselen = map (current_angle[k], -57, 90, SERVOMIN[k], SERVOMAX[k]);
+      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k], SERVOMAX[k]);
       pwm.setPWM(k+1, 0, pulselen);
      // pwm.setPWM(k+1, 0, current_angle[k]);
     
@@ -91,7 +94,12 @@ for (int b = 0; b < steps_quantity; b++){
   }
 
 }
+for (int c = 550; c > 200; c--){
+    pwm.setPWM(0, 0, c);
+    Serial.flush();
+    delay(20);
   
+}
 }
 
 void loop() {}
