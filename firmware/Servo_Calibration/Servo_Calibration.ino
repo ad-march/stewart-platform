@@ -17,24 +17,26 @@ void setup() {
 void loop() {
   
 //Mean position
-/*
+
   for (int i = 0; i < 6; i++){
       pwm.setPWM(i+1, 0, SERVOMEAN[i]);
       Serial.flush();
     }
 
+delay(1000);
 
 //Max position
   for (int i = 0; i < 6; i++){
       pwm.setPWM(i+1, 0, SERVOMAX[i]);
       Serial.flush();
     }
-*/
+
+delay(1000);
 
 //Min position
   for (int i = 0; i < 6; i++){
       pwm.setPWM(i+1, 0, SERVOMIN[i]);
       Serial.flush();
     }
-
+delay(1000);
 }
