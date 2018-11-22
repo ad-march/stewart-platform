@@ -4,14 +4,14 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 //Servo calibration:
 int SERVOMIN[] = {300,410,225,410,240,415,230};
-int SERVOMAX[] = {575,210,520,215,530,210,530};
-int SERVOMEAN[] = {445,390,350,390,350,430,330};  //need to calibrate servo 0 drop location
+int SERVOMAX[] = {445,210,520,215,530,210,530};
+int SERVOMEAN[] = {575,390,350,390,350,415,345};  //need to calibrate servo 0 drop location
 
 int servonum = 0;
-const int servo_quantity = 6;
+const int servo_quantity = 7;
 const int steps_quantity = 16;
-double current_angle [] = {0,0,0,0,0,0};
-double target_angle [][servo_quantity] = {
+double current_angle [] = {0,0,0,0,0,0,0};
+double target_angle [][servo_quantity - 1] = {
 {1.65 , 1.40 , -1.42 , -1.66 , -0.24 , 0.24 }, 
 {3.28 , 2.79 , -2.86 , -3.33 , -0.48 , 0.49 }, 
 {4.91 , 4.16 , -4.31 , -5.02 , -0.72 , 0.73 }, 
@@ -45,46 +45,39 @@ double tilt_angle[steps_quantity];
     tilt_angle[f]=0;  //initialize arry to zeros
   }
 
-tilt_angle[5]=40;
-tilt_angle[6]=80;
-tilt_angle[7]=90;
-tilt_angle[8]=95;
-tilt_angle[9]=100;
+tilt_angle[5]=20;
+tilt_angle[6]=40;
+tilt_angle[7]=60;
+tilt_angle[8]=70;
+tilt_angle[9]=80;
 
   for (int f = 10; f < steps_quantity; f++){
-    tilt_angle[f]=120;  //initialize arry to zeros
+    tilt_angle[f]=90;  //initialize array to zeros
   }
 
 double pauses[steps_quantity];
   for (int d = 0; d < steps_quantity; d++){
-    pauses[d]=75;  //initialize arry to zeros
+    pauses[d]=0;  //initialize arry to zeros
   }
 
-pauses[0]=4000;
-pauses[6]=100;
-pauses[7]=175;
-pauses[8]=175;
+pauses[0]=5000;
 pauses[9]=175;
 
 //pauses[11]=2000;   //must enter each location where a pause is required
 
 double speed[steps_quantity];    //speed factor = number of degrees per step
   for (int e = 0; e < steps_quantity; e++){
-    speed[e]=0.5;  //sets global speed factor
+    speed[e]=0.25;  //sets global speed factor
   }
 
 
   for (int a = 0; a < servo_quantity; a++){
-    double pulselen = map (current_angle[a], 0, 80, SERVOMEAN[a+1], SERVOMAX[a+1]);
-    pwm.setPWM(a+1, 0, pulselen);
-    Serial.flush();
-  
-  pwm.setPWM(0, 0, SERVOMAX[0]);
+    double pulselen = map (current_angle[a], 0, 80, SERVOMEAN[a], SERVOMAX[a]);
+    pwm.setPWM(a, 0, pulselen);
     Serial.flush();
     
   }
 
-  delay(2500);
 
 for (int b = 0; b < steps_quantity; b++){  
 
@@ -93,7 +86,7 @@ for (int b = 0; b < steps_quantity; b++){
   int servonum_max;
   
     for (int i = 1; i < servo_quantity; i++) {  //start at i=1 since we do not want to consider top servo motion here
-      double diff = abs(target_angle[b][i]-current_angle[i]);
+      double diff = abs(target_angle[b][i-1]-current_angle[i]);
       
       if (diff > max_diff){
         max_diff=diff;
@@ -102,24 +95,31 @@ for (int b = 0; b < steps_quantity; b++){
     }
   
   // Split into step sizes for same total move time
-  double step_size [servo_quantity];
+  double step_size [servo_quantity+1];
    for (int j = 0; j < servo_quantity; j++) {
-    step_size[j] = speed[b]*(target_angle[b][j]-current_angle[j])/(max_diff+0.001); //+0.001 prevents divide by zero error
+    if(j==0){
+      step_size[j] = speed[b]*(tilt_angle[b]-current_angle[j])/(max_diff+0.001);
+    }
+    else{
+      step_size[j] = speed[b]*(target_angle[b][j-1]-current_angle[j])/(max_diff+0.001);//+0.001 prevents divide by zero error
+    }
    }
   
   
   //makes stuff move
 
   
-  if(current_angle[servonum_max]<target_angle[b][servonum_max]){
+  if(current_angle[servonum_max]<target_angle[b][servonum_max-1]){
     
-    while(current_angle[servonum_max] < target_angle[b][servonum_max]){
+    while(current_angle[servonum_max] < target_angle[b][servonum_max-1]){
+
+
      
      for (int k = 0; k < servo_quantity; k++){
       
       current_angle[k] = current_angle[k] + step_size[k];
-      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k+1], SERVOMAX[k+1]);
-      pwm.setPWM(k+1, 0, pulselen);
+      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k], SERVOMAX[k]);
+      pwm.setPWM(k, 0, pulselen);
      // pwm.setPWM(k+1, 0, current_angle[k]);
     
       Serial.flush();
@@ -127,13 +127,13 @@ for (int b = 0; b < steps_quantity; b++){
     }
     }
   else {
-    while(current_angle[servonum_max] > target_angle[b][servonum_max]){
+    while(current_angle[servonum_max] > target_angle[b][servonum_max-1]){
      
      for (int k = 0; k < servo_quantity; k++){
       
       current_angle[k] = current_angle[k] + step_size[k];
-      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k+1], SERVOMAX[k+1]);
-      pwm.setPWM(k+1, 0, pulselen);
+      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k], SERVOMAX[k]);
+      pwm.setPWM(k, 0, pulselen);
      // pwm.setPWM(k+1, 0, current_angle[k]);
     
       Serial.flush();
@@ -141,7 +141,7 @@ for (int b = 0; b < steps_quantity; b++){
     }  
   }
 delay(pauses[b]);
-pwm.setPWM(0, 0, map (tilt_angle[b], 0, 100, SERVOMAX[0], SERVOMEAN[0]));
+//pwm.setPWM(0, 0, map (tilt_angle[b], 0, 100, SERVOMAX[0], SERVOMEAN[0]));
 
 } 
 }
