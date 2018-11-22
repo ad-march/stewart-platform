@@ -11,9 +11,9 @@ linewidth = 2;
 x_lim = rb+50;
 y_lim = rb+50;
 
-degree_increment = 5;
+degree_increment = 1;
 %n_segments = 30;% number of degrees rotation
-n_segments = 30/degree_increment;
+n_segments = 5/degree_increment;
 %translation vector
 Tx=0/n_segments;
 Ty=0/n_segments;
@@ -152,24 +152,11 @@ asize = size(servo_angles_degrees);
 
 
 
-%{
-filename = 'servo_data.csv';
-csvwrite(filename,servo_angles_degrees,0,0);
 
-
-for i=1:asize(1)
-bracket_left(i)='(';
-bracket_right(i)=')';
-end
-newdata = strcat(transpose(bracket_left),servo_angles_degrees);
-csvwrite(filename,transpose(bracket_left));
-%}
-
-
-%redefine motion
+%reverse first motion
 %translation vector
 Tx=0;
-Ty=0/n_segments;
+Ty=0;
 Tz=0;
 T = [Tx Ty Tz];
 
@@ -235,4 +222,74 @@ zlabel('z');
 end
 servo_angles_degrees(asize(1)+1:asize(1)+1+n_segments,:) = transpose(rad2deg(servo_angle));
 
-%}
+
+
+
+%2nd motion
+%translation vector
+Tx=0;
+Ty=0;
+Tz=0;
+T = [Tx Ty Tz];
+
+%rotation matrix
+alpha=0; 
+beta=degree_increment;
+gamma=0;
+R_x = [1,0,0 ; 0, cos(deg2rad(alpha)), sin(deg2rad(alpha)); 0, -sin(deg2rad(alpha)), cos(deg2rad(alpha))];
+R_y = [ cos(deg2rad(beta)),0, -sin(deg2rad(beta)); 0,1,0 ; sin(deg2rad(beta)),0, cos(deg2rad(beta))];
+R_z = [cos(deg2rad(gamma)), sin(deg2rad(gamma)), 0; -sin(deg2rad(gamma)), cos(deg2rad(gamma)),0; 0,0,1];
+R = R_x * R_y * R_z ;
+
+
+%move platform - motion divided into n_segments
+for j=1:n_segments
+
+pause(0.001);
+
+%update top mount pts
+%to rotate around its own axis, it translates itself back to the origin,rotates and then translates back
+top = transpose(R*transpose(top - ones(7,3).*platform_center)) + ones(7,3).*(platform_center + T);
+platform_center = platform_center + T;
+
+%plot top
+plot3(top(:,1),top(:,2),top(:,3),'g', 'linewidth', linewidth);
+hold on;
+
+%plot base
+plot3(base(:,1),base(:,2),base(:,3),'r', 'linewidth', linewidth); %connects the dots
+hold on;
+
+%plots links
+for i=1:6
+lengths(i) = norm(top(i,:) - base(i,:));
+M = 2*l_crank*(top(i,3)-base(i,3));
+N = 2*l_crank*(cos(B(i))*(top(i,1)-base(i,1)) + sin(B(i))*(top(i,2)-base(i,2)));
+L=lengths(i)^2-(l_rocker^2-l_crank^2);
+servo_angle(i,j+1) = asin(L/sqrt(M^2+N^2)) - atan(N/M);
+crank = [base(i,1) + l_crank*cos(B(i))*cos(servo_angle(i,j+1)), base(i,2) + l_crank*cos(servo_angle(i,j+1))*sin(B(i)),...
+        base(i,3) + l_crank*sin(servo_angle(i,j+1))];
+
+link1 = [top(i,:); crank];
+link2 = [crank;base(i,:)];
+plot3(link1(:,1),link1(:,2),link1(:,3),'m', 'linewidth', linewidth);
+hold on;
+plot3(link2(:,1),link2(:,2),link2(:,3),'c', 'linewidth', linewidth);
+hold on;
+
+% compute misalignemnt angles
+N = cross([base(i,1) base(i,2) 0] - base(1,:), [base(i,1) base(i,2) 0] - crank);
+%// angle between plane and line, equals pi/2 - angle between D-E and N
+plane_angle(i,j+1) = rad2deg(abs( pi/2 - acos( dot(crank-top(i,:), N)/norm(N)/norm(crank-top(i,:)) ) ));
+
+end
+
+hold off;
+axis([-x_lim x_lim -y_lim y_lim -h-l_crank h]);
+grid on;
+xlabel('x');
+ylabel('y');
+zlabel('z');
+
+end
+servo_angles_degrees(2*asize(1)+1:2*asize(1)+1+n_segments,:) = transpose(rad2deg(servo_angle));
