@@ -24,7 +24,7 @@ Tz=[0,0,0,0,0,0,0,0];
 
 %rotation arrays
 alpha_array = [0,0,degree_increment,-degree_increment,0,0,degree_increment,-degree_increment];
-beta_array = [degree_increment,-degree_increment,0,0,-degree_increment,degree_increment,0,0];
+beta_array = [-degree_increment,degree_increment,0,0,degree_increment,-degree_increment,0,0];
 gamma_array = [0,0,0,0,0,0,0,0];
 
 %arrays initialize
@@ -165,6 +165,24 @@ ylabel('y');
 zlabel('z');
 
 end
+%servo_angles_degrees((k-1)*asize+1:(k-1)*asize+1+n_segments,:) = transpose(rad2deg(servo_angle));
+servo_angles_degrees((k-1)*(asize-1)+1:(k-1)*(asize-1)+n_segments,:) = transpose(rad2deg(servo_angle(:,2:asize)));
 
-servo_angles_degrees((k-1)*asize+1:(k-1)*asize+1+n_segments,:) = transpose(rad2deg(servo_angle));
+
+
+%{
+sz = size(servo_angles_degrees);
+B=zeros(1,6);
+for w= sz(1):-1:2
+    tf = isequal(servo_angles_degrees(w,1:6),B);
+    if (tf)
+    servo_angles_degrees(w,:) = [];
+    end
+end
+%}
+fileID = fopen('servo_data.txt','w');
+fprintf(fileID,'{%4.2f , %4.2f , %4.2f , %4.2f , %4.2f , %4.2f }, \r\n',transpose(servo_angles_degrees));
+fclose(fileID);
+
+
 end
