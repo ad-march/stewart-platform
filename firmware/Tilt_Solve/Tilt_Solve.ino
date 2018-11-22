@@ -3,27 +3,34 @@
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 //Servo calibration:
-int SERVOMIN[] = {410,225,410,240,415,230};
-int SERVOMAX[] = {210,520,215,530,210,530};
-int SERVOMEAN[] = {390,350,390,350,380,350};  //need to calibrate servo 0 drop location
+int SERVOMIN[] = {300,410,225,410,240,415,230};
+int SERVOMAX[] = {575,210,520,215,530,210,530};
+int SERVOMEAN[] = {445,390,350,390,350,430,330};  //need to calibrate servo 0 drop location
 
 int servonum = 0;
 const int servo_quantity = 6;
-const int steps_quantity = 13;
-//double tilt_angle[];
+const int steps_quantity = 16;
 double current_angle [] = {0,0,0,0,0,0};
-double target_angle [][servo_quantity] = {{-2.876305152,-5.028024071,-5.978480785,-4.031793332,8.546862028,8.701244442,},
-                                          {-5.875942145,-10.0872343,-12.06476658,-8.265003037,16.76852736,17.10373608},
-                                          {-8.987362856,-15.18078027,-18.29754001,-12.69771655,24.84846471,25.39864626},
-                                          {-12.19560449,-20.31251615,-24.7311411,-17.32320941,32.98501674,33.7959864},
-                                          {-15.48147183,-25.48750517,-31.44905169,-22.12787358,41.44064757,42.58160846},
-                                          {-18.82067943,-30.71290372,-38.59372112,-27.08855944,50.65447697,52.2542404},
-                                          {-15.48147183,-25.48750517,-31.44905169,-22.12787358,41.44064757,42.58160846},                                          
-                                          {-12.19560449,-20.31251615,-24.7311411,-17.32320941,32.98501674,33.7959864},
-                                          {-8.987362856,-15.18078027,-18.29754001,-12.69771655,24.84846471,25.39864626},
-                                          {-5.875942145,-10.0872343,-12.06476658,-8.265003037,16.76852736,17.10373608},
-                                          {-2.876305152,-5.028024071,-5.978480785,-4.031793332,8.546862028,8.701244442},
-                                          {0,0,0,0,0,0}};
+double target_angle [][servo_quantity] = {
+{1.65 , 1.40 , -1.42 , -1.66 , -0.24 , 0.24 }, 
+{3.28 , 2.79 , -2.86 , -3.33 , -0.48 , 0.49 }, 
+{4.91 , 4.16 , -4.31 , -5.02 , -0.72 , 0.73 }, 
+{6.52 , 5.51 , -5.79 , -6.73 , -0.96 , 0.98 }, 
+{8.13 , 6.85 , -7.29 , -8.46 , -1.20 , 1.23 }, 
+{5.02 , 1.38 , -12.93 , -12.37 , 7.48 , 9.80 }, 
+{1.74 , -4.15 , -18.66 , -16.43 , 15.83 , 18.08 }, 
+{-1.72 , -9.74 , -24.52 , -20.61 , 24.02 , 26.26 }, 
+{-5.34 , -15.42 , -30.56 , -24.88 , 32.26 , 34.56 }, 
+{-9.13 , -21.21 , -36.83 , -29.21 , 40.81 , 43.26 }, 
+{-4.60 , -14.28 , -29.33 , -24.02 , 30.60 , 32.88 }, 
+{-0.31 , -7.50 , -22.16 , -18.93 , 20.75 , 22.99 }, 
+{3.73 , -0.83 , -15.21 , -13.98 , 10.85 , 13.13 }, 
+{7.52 , 5.76 , -8.41 , -9.23 , 0.57 , 2.97 }, 
+{11.07 , 12.29 , -1.73 , -4.70 , -10.43 , -7.83 },  
+};
+
+
+
 
 void setup() {
   Serial.begin(9600);
@@ -33,25 +40,46 @@ void setup() {
   
   pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
 
-double pauses[steps_quantity];
-  for (int d = 0; d < steps_quantity; d++){
-    pauses[d]=0;  //initialize arry to zeros
+double tilt_angle[steps_quantity];
+  for (int f = 0; f < steps_quantity; f++){
+    tilt_angle[f]=0;  //initialize arry to zeros
   }
 
-//pauses[6]=1000;   //must enter each location where a pause is required
+tilt_angle[5]=40;
+tilt_angle[6]=80;
+tilt_angle[7]=90;
+tilt_angle[8]=95;
+tilt_angle[9]=100;
+
+  for (int f = 10; f < steps_quantity; f++){
+    tilt_angle[f]=120;  //initialize arry to zeros
+  }
+
+double pauses[steps_quantity];
+  for (int d = 0; d < steps_quantity; d++){
+    pauses[d]=75;  //initialize arry to zeros
+  }
+
+pauses[0]=4000;
+pauses[6]=100;
+pauses[7]=175;
+pauses[8]=175;
+pauses[9]=175;
+
+//pauses[11]=2000;   //must enter each location where a pause is required
 
 double speed[steps_quantity];    //speed factor = number of degrees per step
   for (int e = 0; e < steps_quantity; e++){
-    speed[e]=0.25;  //sets global speed factor
+    speed[e]=0.5;  //sets global speed factor
   }
 
 
   for (int a = 0; a < servo_quantity; a++){
-    double pulselen = map (current_angle[a], 0, 80, SERVOMEAN[a], SERVOMAX[a]);
+    double pulselen = map (current_angle[a], 0, 80, SERVOMEAN[a+1], SERVOMAX[a+1]);
     pwm.setPWM(a+1, 0, pulselen);
     Serial.flush();
   
-  pwm.setPWM(0, 0, 550);
+  pwm.setPWM(0, 0, SERVOMAX[0]);
     Serial.flush();
     
   }
@@ -90,7 +118,7 @@ for (int b = 0; b < steps_quantity; b++){
      for (int k = 0; k < servo_quantity; k++){
       
       current_angle[k] = current_angle[k] + step_size[k];
-      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k], SERVOMAX[k]);
+      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k+1], SERVOMAX[k+1]);
       pwm.setPWM(k+1, 0, pulselen);
      // pwm.setPWM(k+1, 0, current_angle[k]);
     
@@ -104,7 +132,7 @@ for (int b = 0; b < steps_quantity; b++){
      for (int k = 0; k < servo_quantity; k++){
       
       current_angle[k] = current_angle[k] + step_size[k];
-      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k], SERVOMAX[k]);
+      double pulselen = map (current_angle[k], 0, 80, SERVOMEAN[k+1], SERVOMAX[k+1]);
       pwm.setPWM(k+1, 0, pulselen);
      // pwm.setPWM(k+1, 0, current_angle[k]);
     
@@ -113,6 +141,8 @@ for (int b = 0; b < steps_quantity; b++){
     }  
   }
 delay(pauses[b]);
+pwm.setPWM(0, 0, map (tilt_angle[b], 0, 100, SERVOMAX[0], SERVOMEAN[0]));
+
 } 
 }
 
