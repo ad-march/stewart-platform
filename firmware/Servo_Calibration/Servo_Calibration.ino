@@ -3,9 +3,9 @@
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 //Servo calibration:
-int SERVOMIN[] = {410,225,410,240,415,230};
-int SERVOMAX[] = {190,460,185,465,190,460};
-int SERVOMEAN[] = {330,305,330,315,340,315};
+int SERVOMIN[] = {300,410,225,410,240,415,230};
+int SERVOMAX[] = {575,210,520,215,530,210,530};
+int SERVOMEAN[] = {480,390,350,390,350,380,350};
 
 
 void setup() {
@@ -17,14 +17,17 @@ void setup() {
 void loop() {
   
 //Mean position
+   pwm.setPWM(0, 0, SERVOMAX[0]);
+      Serial.flush();
 
+/*
   for (int i = 0; i < 6; i++){
-      pwm.setPWM(i+1, 0, SERVOMEAN[i]);
+      pwm.setPWM(i+1, 0, SERVOMAX[i]);
       Serial.flush();
     }
 
 delay(1000);
-/*
+
 //Max position
   for (int i = 0; i < 6; i++){
       pwm.setPWM(i+1, 0, SERVOMAX[i]);
