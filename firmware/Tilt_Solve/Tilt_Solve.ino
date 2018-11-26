@@ -4,29 +4,26 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 //Servo calibration:
 int SERVOMIN[] = {300,410,225,410,240,415,230};
-int SERVOMAX[] = {445,210,520,215,530,210,530};
-int SERVOMEAN[] = {575,390,350,390,350,415,345};  //need to calibrate servo 0 drop location
+int SERVOMAX[] = {440,210,530,215,530,210,530};
+int SERVOMEAN[] = {585,390,350,370,350,370,360};  //need to calibrate servo 0 drop location
 
 int servonum = 0;
 const int servo_quantity = 7;
-const int steps_quantity = 16;
+const int steps_quantity = 12;
 double current_angle [] = {0,0,0,0,0,0,0};
 double target_angle [][servo_quantity - 1] = {
-{1.65 , 1.40 , -1.42 , -1.66 , -0.24 , 0.24 }, 
-{3.28 , 2.79 , -2.86 , -3.33 , -0.48 , 0.49 }, 
+{1.24 , 1.05 , -1.06 , -1.24 , -0.18 , 0.18 }, 
+{2.47 , 2.10 , -2.14 , -2.50 , -0.36 , 0.37 }, 
+{3.69 , 3.13 , -3.22 , -3.76 , -0.54 , 0.55 }, 
 {4.91 , 4.16 , -4.31 , -5.02 , -0.72 , 0.73 }, 
-{6.52 , 5.51 , -5.79 , -6.73 , -0.96 , 0.98 }, 
-{8.13 , 6.85 , -7.29 , -8.46 , -1.20 , 1.23 }, 
-{5.02 , 1.38 , -12.93 , -12.37 , 7.48 , 9.80 }, 
-{1.74 , -4.15 , -18.66 , -16.43 , 15.83 , 18.08 }, 
-{-1.72 , -9.74 , -24.52 , -20.61 , 24.02 , 26.26 }, 
-{-5.34 , -15.42 , -30.56 , -24.88 , 32.26 , 34.56 }, 
-{-9.13 , -21.21 , -36.83 , -29.21 , 40.81 , 43.26 }, 
-{-4.60 , -14.28 , -29.33 , -24.02 , 30.60 , 32.88 }, 
-{-0.31 , -7.50 , -22.16 , -18.93 , 20.75 , 22.99 }, 
-{3.73 , -0.83 , -15.21 , -13.98 , 10.85 , 13.13 }, 
-{7.52 , 5.76 , -8.41 , -9.23 , 0.57 , 2.97 }, 
-{11.07 , 12.29 , -1.73 , -4.70 , -10.43 , -7.83 },  
+{3.31 , 1.43 , -7.09 , -6.86 , 3.66 , 5.08 }, 
+{1.67 , -1.32 , -9.88 , -8.74 , 7.94 , 9.32 }, 
+{-0.01 , -4.08 , -12.70 , -10.65 , 12.13 , 13.50 }, 
+{-1.73 , -6.85 , -15.53 , -12.60 , 16.27 , 17.62 }, 
+{-6.82 , -11.43 , -20.72 , -18.19 , 7.50 , 8.88 }, 
+{-12.14 , -16.21 , -26.24 , -24.18 , -1.55 , -0.11 }, 
+{-17.79 , -21.25 , -32.21 , -30.74 , -11.20 , -9.64 }, 
+{-23.87 , -26.61 , -38.81 , -38.12 , -21.89 , -20.12 },   
 };
 
 
@@ -45,14 +42,14 @@ double tilt_angle[steps_quantity];
     tilt_angle[f]=0;  //initialize arry to zeros
   }
 
-tilt_angle[5]=20;
-tilt_angle[6]=40;
-tilt_angle[7]=60;
-tilt_angle[8]=70;
-tilt_angle[9]=80;
+tilt_angle[3]=20;
+tilt_angle[4]=40;
+tilt_angle[5]=60;
+tilt_angle[6]=70;
+tilt_angle[7]=80;
 
-  for (int f = 10; f < steps_quantity; f++){
-    tilt_angle[f]=90;  //initialize array to zeros
+  for (int f = 8; f < steps_quantity; f++){
+    tilt_angle[f]=100;  //initialize array to zeros
   }
 
 double pauses[steps_quantity];
@@ -60,15 +57,20 @@ double pauses[steps_quantity];
     pauses[d]=0;  //initialize arry to zeros
   }
 
-pauses[0]=5000;
-pauses[9]=175;
+pauses[0]=4000;
+pauses[6]=200;
 
 //pauses[11]=2000;   //must enter each location where a pause is required
 
 double speed[steps_quantity];    //speed factor = number of degrees per step
   for (int e = 0; e < steps_quantity; e++){
-    speed[e]=0.25;  //sets global speed factor
+    speed[e]=0.20;  //sets global speed factor
   }
+
+  for (int e = 8; e < steps_quantity; e++){
+    speed[e]=0.5;  //sets global speed factor
+  }
+
 
 
   for (int a = 0; a < servo_quantity; a++){
