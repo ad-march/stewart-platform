@@ -39,8 +39,8 @@ Ty=[0,0,0,0,0,0,0,0];
 Tz=[0,0,0,0,0,0,0,0];
 
 %rotation arrays
-alpha_array = [-5/n_segments,20/n_segments,-20/n_segments,0,10/n_segments,-5/n_segments];
-beta_array = [-15/n_segments,10/n_segments,0,20/n_segments,-10/n_segments,-5/n_segments];
+alpha_array = [-5/n_segments,20/n_segments,-10/n_segments,-10/n_segments,10/n_segments,-5/n_segments];
+beta_array = [-15/n_segments,10/n_segments,0,15/n_segments,-5/n_segments,-5/n_segments];
 %[-degree_increment,degree_increment,0,0,degree_increment,-degree_increment,0,0];
 gamma_array = [0,0,0,0,0,0,0,0];
 
