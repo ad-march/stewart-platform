@@ -2,6 +2,8 @@
 #include <Adafruit_PWMServoDriver.h>
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
+
+
 //Servo calibration:
 int SERVOMIN[] = {300,410,225,410,240,415,230};
 int SERVOMAX[] = {440,210,530,215,530,210,530};
@@ -69,6 +71,8 @@ void setup() {
   Serial.begin(9600);
   Serial.println("8 channel Servo test!");
 
+  pinMode(53, INPUT);
+  
   pwm.begin();
   
   pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
@@ -96,12 +100,13 @@ double pauses[steps_quantity];
   }
   
   for (int d = 0; d < steps_quantity; d=d+8){
-    pauses[d]=500;  //pauses every 4 moves
+    pauses[d]=400;  //pauses every 4 moves
   }
 
 
 pauses[0]=5000;
-pauses[24]=50;
+pauses[16]=700;
+pauses[24]=0;
 pauses[32]=1000;
 
 //pauses[11]=2000;   //must enter each location where a pause is required
@@ -126,6 +131,14 @@ double speed[steps_quantity];    //speed factor = number of degrees per step
 
 
 for (int b = 0; b < steps_quantity; b++){  
+
+/*
+  if(b=0){    //Wait for switch
+    while(digitalRead(53)==LOW){
+      delay(10);
+    }
+  }
+*/
 
   //Finds servo having to move the most
   double max_diff = 0;
