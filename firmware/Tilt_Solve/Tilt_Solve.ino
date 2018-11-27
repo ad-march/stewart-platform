@@ -64,7 +64,7 @@ pauses[6]=200;
 
 double speed[steps_quantity];    //speed factor = number of degrees per step
   for (int e = 0; e < steps_quantity; e++){
-    speed[e]=0.20;  //sets global speed factor
+    speed[e]=0.15;  //sets global speed factor
   }
 
   for (int e = 8; e < steps_quantity; e++){
