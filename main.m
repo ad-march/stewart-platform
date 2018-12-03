@@ -11,10 +11,9 @@ linewidth = 2;
 x_lim = rb+50;
 y_lim = rb+50;
 
-n_motions = 6;
-n_segments = 8;
+n_motions = 1;
+n_segments = 1;
 degree_increment = 10/n_segments;
-%n_segments = 15/degree_increment;
 asize = n_segments +1;
 
 %{ 
@@ -31,19 +30,17 @@ beta_array = [3/n_segments,0,0,0,0,0,0,0];
 gamma_array = [0,0,0,0,0,0,0,0];
 %}
 
-%%{
+
 %regular solve
 %translation arrays
-Tx=[0,0,0,0,0,0,0,0];
-Ty=[0,0,0,0,0,0,0,0];
-Tz=[0,0,0,0,0,0,0,0];
+Tx=[0,0,0,0,0,0,0,0,0,0];
+Ty=[0,0,0,0,0,0,0,0,0,0];
+Tz=[-30,0,0,0,0,0,0,0,0,0];
 
-%rotation arrays
-alpha_array = [-5/n_segments,20/n_segments,-10/n_segments,-10/n_segments,10/n_segments,-5/n_segments];
-beta_array = [-15/n_segments,10/n_segments,0,15/n_segments,-5/n_segments,-5/n_segments];
-%[-degree_increment,degree_increment,0,0,degree_increment,-degree_increment,0,0];
-gamma_array = [0,0,0,0,0,0,0,0];
-
+%rotation arrays = regular solve
+alpha_array = [-5/n_segments,20/n_segments,-20/n_segments,0,10/n_segments,-5/n_segments];
+beta_array = [-15/n_segments,10/n_segments,0,20/n_segments,-10/n_segments,-5/n_segments];
+gamma_array = [0,0,0,0,0,0,0,0,0,0];
 
 %arrays initialize
 top = ones(7,3);
@@ -114,17 +111,8 @@ hold off;
 
 for k = 1:n_motions
 
-%degree_increment = 2.5;
-%n_segments = 5/degree_increment;
-
-
 T = [Tx(k) Ty(k) Tz(k)];
-
-%asize = n_segments +1;
-
-
-    
-   
+  
 alpha = alpha_array(k);
 beta = beta_array(k);
 gamma = gamma_array(k);
@@ -186,9 +174,8 @@ end
 
 servo_angles_degrees((k-1)*(asize-1)+1:(k-1)*(asize-1)+n_segments,:) = transpose(rad2deg(servo_angle(:,2:asize)));
 
-fileID = fopen('servo_data_normal_solve_with_tilt_inhole.txt','w');
+fileID = fopen('servo_data_20deg_tilt.txt','w');
 fprintf(fileID,'{%4.2f , %4.2f , %4.2f , %4.2f , %4.2f , %4.2f }, \r\n',transpose(servo_angles_degrees));
 fclose(fileID);
-
 
 end
